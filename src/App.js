@@ -1,9 +1,9 @@
 import React from 'react';
-import DragAndDrop from './DragAndDrop';
+import Like from './Like';
 
 const App = () => (
   <div className="App">
-    <DragAndDrop />
+    <Like />
   </div>
 );
 
