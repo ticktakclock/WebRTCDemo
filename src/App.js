@@ -1,9 +1,9 @@
 import React from 'react';
-import Like from './Like';
+import MultiVideoChat from './MultiVideoChat';
 
 const App = () => (
   <div className="App">
-    <Like />
+    <MultiVideoChat />
   </div>
 );
 
