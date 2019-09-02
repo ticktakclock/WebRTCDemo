@@ -1,4 +1,5 @@
 import React from 'react';
+import { Fab } from '@material-ui/core';
 import io from 'socket.io-client';
 import Like from './Like';
 
@@ -6,7 +7,7 @@ class MultVideoChat extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      room: 'test',
+      room: props.roomName,
       myVideo: null,
       peers: {},
       count: 0,
@@ -349,7 +350,7 @@ class MultVideoChat extends React.Component {
 
   render() {
     return (
-      <div style={{ width: '100vw', height: '100vh' }}>
+      <div>
         <div style={videoAreaStyle}>
           <video
             id={this.state.socketId}
@@ -425,6 +426,9 @@ class MultVideoChat extends React.Component {
         >
           bye
         </button>
+        <Fab style={muiFabStyle} color="primary">
+          a
+        </Fab>
       </div>
     );
   }
@@ -460,6 +464,12 @@ const fullScreenStyle = {
   width: '100vw',
   height: '100vh',
   background: 'black',
+};
+
+const muiFabStyle = {
+  position: 'absolute',
+  bottom: '2rem',
+  right: '2rem',
 };
 
 export default MultVideoChat;
