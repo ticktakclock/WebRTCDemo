@@ -8,6 +8,10 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 const App = () => {
   const vh = window.innerHeight;
   document.documentElement.style.setProperty('--full-vh', `${vh}px`);
+  navigator.getUserMedia =
+    navigator.getUserMedia ||
+    navigator.webkitGetUserMedia ||
+    window.navigator.mozGetUserMedia;
 
   const [roomName, setRoomName] = useState('');
   return (

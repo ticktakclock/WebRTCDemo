@@ -1,5 +1,5 @@
 import React from 'react';
-import { Fab } from '@material-ui/core';
+import { Fab, Grid } from '@material-ui/core';
 import io from 'socket.io-client';
 import Like from './Like';
 
@@ -43,11 +43,6 @@ class MultVideoChat extends React.Component {
     this.videos = {};
     this.senders = {};
 
-    navigator.getUserMedia =
-      navigator.getUserMedia ||
-      navigator.webkitGetUserMedia ||
-      window.navigator.mozGetUserMedia;
-    window.URL = window.URL || window.webkitURL;
     this.socket = io('localhost:9090');
     this.socket.on('RECEIVE_CONNECTED', data => {
       console.log('socket.io connected. id=' + data.id);
@@ -59,6 +54,10 @@ class MultVideoChat extends React.Component {
     this.socket.on('RECEIVE_CANDIDATE', this.onReceiveCandidate);
     this.socket.on('RECEIVE_LEAVE', this.onReceiveLeave);
     this.socket.on('RECEIVE_FULLSCREEN', this.onReceiveFullScreen);
+  }
+
+  componentWillUnmount() {
+    this.onClickBye();
   }
 
   onReceiveSdp(sdp) {
@@ -159,17 +158,6 @@ class MultVideoChat extends React.Component {
 
   onRemoveStream(id) {
     console.log('onRemoveStream:' + id);
-    // const video = this.videos[id];
-    // if (video) {
-    //   video.pause();
-    //   video.srcObject = null;
-    // }
-    // const peer = this.state.peers[id];
-    // if (peer) {
-    //   peer.close();
-    //   delete this.state.peers[id];
-    //   this.setState({ peers: this.state.peers });
-    // }
   }
 
   onIceCandidate(id, icecandidate) {
@@ -350,36 +338,40 @@ class MultVideoChat extends React.Component {
 
   render() {
     return (
-      <div>
-        <div style={videoAreaStyle}>
-          <video
-            id={this.state.socketId}
-            style={
-              this.isFullScreen(this.state.socketId)
-                ? fullScreenStyle
-                : videoStyle
-            }
-            autoPlay="1"
-            playsInline
-            ref={video => {
-              this.video = video;
-            }}
-          />
+      <div style={{ flexGrow: '1', padding: '1rem' }}>
+        <Grid container spacing={4} justify="center" alignItems="flex-start">
+          <Grid item md={4} sm={6} xs={12}>
+            <video
+              id={this.state.socketId}
+              style={
+                this.isFullScreen(this.state.socketId)
+                  ? fullScreenStyle
+                  : videoStyle
+              }
+              autoPlay="1"
+              playsInline
+              ref={video => {
+                this.video = video;
+              }}
+            />
+          </Grid>
           {Object.keys(this.state.peers).map(key => {
             return (
-              <video
-                id={key}
-                key={key}
-                style={this.isFullScreen(key) ? fullScreenStyle : videoStyle}
-                autoPlay="1"
-                playsInline
-                ref={video => {
-                  this.videos[key] = video;
-                }}
-              />
+              <Grid item md={4} sm={6} xs={12}>
+                <video
+                  id={key}
+                  key={key}
+                  style={this.isFullScreen(key) ? fullScreenStyle : videoStyle}
+                  autoPlay="1"
+                  playsInline
+                  ref={video => {
+                    this.videos[key] = video;
+                  }}
+                />
+              </Grid>
             );
           })}
-        </div>
+        </Grid>
         {this.state.fullScreenId ? <Like /> : null}
         <button style={fabStyle} type="button" onClick={this.onCapcureStart}>
           cap
@@ -440,8 +432,8 @@ const videoAreaStyle = {
 };
 
 const videoStyle = {
-  width: '16rem',
-  height: '9rem',
+  alignSelf: 'center',
+  width: '100%',
   background: 'black',
 };
 
