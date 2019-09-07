@@ -1,7 +1,9 @@
 import React from 'react';
-import { Fab, Grid } from '@material-ui/core';
+import { Grid, Dialog, IconButton } from '@material-ui/core';
+import CloseIcon from '@material-ui/icons/Close';
 import io from 'socket.io-client';
 import Like from './Like';
+import Drawer from './CustomDrawer';
 
 class MultVideoChat extends React.Component {
   constructor(props) {
@@ -33,7 +35,7 @@ class MultVideoChat extends React.Component {
     this.sendIceCandidate = this.sendIceCandidate.bind(this);
     this.onDisconnect = this.onDisconnect.bind(this);
     this.onVideoStart = this.onVideoStart.bind(this);
-    this.onCapcureStart = this.onCapcureStart.bind(this);
+    this.onCaptureStart = this.onCaptureStart.bind(this);
     this.onVideoStop = this.onVideoStop.bind(this);
     this.onClickCall = this.onClickCall.bind(this);
     this.onClickBye = this.onClickBye.bind(this);
@@ -280,7 +282,7 @@ class MultVideoChat extends React.Component {
     );
   }
 
-  async onCapcureStart() {
+  async onCaptureStart() {
     console.log(this.state.peers);
     // 画面キャプチャ
     navigator.mediaDevices
@@ -338,90 +340,75 @@ class MultVideoChat extends React.Component {
 
   render() {
     return (
-      <div style={{ flexGrow: '1', padding: '1rem' }}>
-        <Grid container spacing={4} justify="center" alignItems="flex-start">
-          <Grid item md={4} sm={6} xs={12}>
-            <video
-              id={this.state.socketId}
-              style={
-                this.isFullScreen(this.state.socketId)
-                  ? fullScreenStyle
-                  : videoStyle
+      <>
+        <Dialog
+          maxWidth="xl"
+          fullWidth
+          open={this.state.fullScreenId !== ''}
+          onClose={this.onFullScreen}
+        >
+          <video
+            style={fullScreenStyle}
+            autoPlay="1"
+            playsInline
+            ref={video => {
+              const fullScreen =
+                this.videos[this.state.fullScreenId] || this.video;
+              if (video && fullScreen) {
+                video.srcObject = fullScreen.srcObject;
               }
-              autoPlay="1"
-              playsInline
-              ref={video => {
-                this.video = video;
-              }}
-            />
+            }}
+          />
+          <IconButton
+            style={closeButtonStyle}
+            color="primary"
+            onClick={this.onFullScreen}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Dialog>
+        <div style={{ flexGrow: '1', padding: '1rem' }}>
+          <Grid container spacing={4} justify="center" alignItems="flex-start">
+            <Grid item md={4} sm={6} xs={12}>
+              <video
+                id={this.state.socketId}
+                style={videoStyle}
+                autoPlay="1"
+                playsInline
+                ref={video => {
+                  this.video = video;
+                }}
+              />
+            </Grid>
+            {Object.keys(this.state.peers).map(key => {
+              return (
+                <Grid item md={4} sm={6} xs={12}>
+                  <video
+                    id={key}
+                    key={key}
+                    style={videoStyle}
+                    autoPlay="1"
+                    playsInline
+                    ref={video => {
+                      this.videos[key] = video;
+                    }}
+                  />
+                </Grid>
+              );
+            })}
           </Grid>
-          {Object.keys(this.state.peers).map(key => {
-            return (
-              <Grid item md={4} sm={6} xs={12}>
-                <video
-                  id={key}
-                  key={key}
-                  style={this.isFullScreen(key) ? fullScreenStyle : videoStyle}
-                  autoPlay="1"
-                  playsInline
-                  ref={video => {
-                    this.videos[key] = video;
-                  }}
-                />
-              </Grid>
-            );
-          })}
-        </Grid>
-        {this.state.fullScreenId ? <Like /> : null}
-        <button style={fabStyle} type="button" onClick={this.onCapcureStart}>
-          cap
-        </button>
-        <button
-          style={{ ...fabStyle, right: '5rem' }}
-          type="button"
-          onClick={this.onVideoStart}
-        >
-          cam
-        </button>
-        <button
-          style={{ ...fabStyle, right: '9rem' }}
-          type="button"
-          onClick={this.onVideoStop}
-        >
-          stop
-        </button>
-        <button
-          style={{ ...fabStyle, right: '13rem' }}
-          type="button"
-          onClick={this.onClickCall}
-        >
-          call
-        </button>
-        <button
-          style={{ ...fabStyle, right: '17rem' }}
-          type="button"
-          onClick={this.onVideoMute}
-        >
-          video mute
-        </button>
-        <button
-          style={{ ...fabStyle, right: '21rem' }}
-          type="button"
-          onClick={this.onFullScreen}
-        >
-          full screen
-        </button>
-        <button
-          style={{ ...fabStyle, right: '25rem' }}
-          type="button"
-          onClick={this.onClickBye}
-        >
-          bye
-        </button>
-        <Fab style={muiFabStyle} color="primary">
-          a
-        </Fab>
-      </div>
+          {this.state.fullScreenId ? <Like /> : null}
+          <Drawer
+            onCaptureStart={this.onCaptureStart}
+            onCameraStart={this.onVideoStart}
+            onVideoStop={this.onVideoStop}
+            onCall={this.onClickCall}
+            onBye={this.onClickBye}
+            onMute={this.onVideoMute}
+            onFullScreen={this.onFullScreen}
+          />
+        </div>
+      </>
     );
   }
 }
@@ -451,10 +438,18 @@ const fabStyle = {
   cursor: 'pointer',
 };
 
+const closeButtonStyle = {
+  position: 'absolute',
+  right: '1rem',
+  top: '1rem',
+  background: 'rgba(204, 204, 204, 0.21)',
+};
+
 const fullScreenStyle = {
-  position: 'fixed',
-  width: '100vw',
-  height: '100vh',
+  // width: '100vw',
+  // height: '100vh',
+  width: '100%',
+  height: '100%',
   background: 'black',
 };
 

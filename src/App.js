@@ -1,9 +1,11 @@
-import React, { Component, useState } from 'react';
-import MultiVideoChat from './MultiVideoChat';
+import React, { Component, useState, useEffect } from 'react';
 import Room from './Room';
 import Entrance from './Entrance';
 import { AppBar, Toolbar, IconButton } from '@material-ui/core';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import MenuIcon from '@material-ui/icons/Menu';
+
+export const MenuContext = React.createContext(false);
 
 const App = () => {
   const vh = window.innerHeight;
@@ -14,29 +16,46 @@ const App = () => {
     window.navigator.mozGetUserMedia;
 
   const [roomName, setRoomName] = useState('');
+  const [isMenuOpen, setMenuOpen] = useState(false);
+  useEffect(() => {
+    if (!roomName) {
+      setMenuOpen(false);
+    }
+  });
   return (
     <>
-      <AppBar position="fixed">
-        <Toolbar>
-          {roomName || 'WebRTC Sample'}
-          {roomName ? (
+      <MenuContext.Provider value={{ isMenuOpen, setMenuOpen, setRoomName }}>
+        <AppBar position="fixed">
+          <Toolbar>
             <IconButton
               color="inherit"
-              style={{ marginLeft: 'auto' }}
-              onClick={() => setRoomName('')}
+              disabled={!roomName}
+              onClick={() => setMenuOpen(!isMenuOpen)}
             >
-              <ExitToAppIcon />
+              <MenuIcon />
             </IconButton>
-          ) : null}
-        </Toolbar>
-      </AppBar>
-      <div style={appStyle}>
-        {roomName ? (
-          <Room roomName={roomName} />
-        ) : (
-          <Entrance setRoomName={setRoomName} />
-        )}
-      </div>
+            <div style={titleStyle}>{roomName || 'WebRTC Sample'}</div>
+            {roomName ? (
+              <>
+                <IconButton
+                  color="inherit"
+                  style={{ marginLeft: 'auto' }}
+                  onClick={() => setRoomName('')}
+                >
+                  <ExitToAppIcon />
+                </IconButton>
+              </>
+            ) : null}
+          </Toolbar>
+        </AppBar>
+        <div style={appStyle}>
+          {roomName ? (
+            <Room roomName={roomName} />
+          ) : (
+            <Entrance setRoomName={setRoomName} />
+          )}
+        </div>
+      </MenuContext.Provider>
     </>
   );
 };
@@ -47,6 +66,10 @@ const appStyle = {
   overflow: 'scroll',
   display: 'flex',
   justifyContent: 'center',
+};
+
+const titleStyle = {
+  marginLeft: '1rem',
 };
 
 export default App;
