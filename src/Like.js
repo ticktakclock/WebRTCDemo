@@ -1,5 +1,4 @@
 import React from 'react';
-import io from 'socket.io-client';
 import injectStyle from './injectStyle';
 
 class Like extends React.Component {
@@ -14,18 +13,8 @@ class Like extends React.Component {
     this.onSocketMouse = this.onSocketMouse.bind(this);
     this.onAnimationEnd = this.onAnimationEnd.bind(this);
 
-    this.socket = io('localhost:9090');
-
-    this.socket.on('RECEIVE_MOUSE_EVENT', this.onSocketMouse);
+    this.props.socket.on('RECEIVE_MOUSE_EVENT', this.onSocketMouse);
     injectStyle(keyframesStyle);
-  }
-
-  mouseDown(ratioX, ratioY) {
-    this.socket.emit('SEND_MOUSE_EVENT', {
-      mouse: 'down',
-      ratioX: ratioX,
-      ratioY: ratioY,
-    });
   }
 
   onSocketMouse(data) {
@@ -34,27 +23,16 @@ class Like extends React.Component {
       default:
         break;
       case 'down':
+        if (!this.likeArea) return;
+        const { offsetWidth, offsetHeight } = this.likeArea;
         const heart = {
-          key: Math.random()
-            .toString(36)
-            .substring(2),
-          style: {
-            position: 'absolute',
-            width: '5rem',
-            height: '5rem',
-            top: data.ratioY * window.innerHeight,
-            left: data.ratioX * window.innerWidth,
-            transform: 'scale(2)',
-            opacity: '0',
-            animation: 'anime1 1s ease-in reverse',
-          },
+          style: heartStyle(
+            data.ratioX * offsetWidth,
+            data.ratioY * offsetHeight
+          ),
         };
         const newHearts = JSON.parse(JSON.stringify(this.state.hearts));
-        newHearts[
-          Math.random()
-            .toString(36)
-            .substring(2)
-        ] = heart;
+        newHearts[generateKey()] = heart;
         this.setState({ hearts: newHearts });
         break;
     }
@@ -62,10 +40,16 @@ class Like extends React.Component {
 
   onMouseDown(e) {
     console.log('onMouseDown()');
-    this.mouseDown(
-      e.clientX / window.innerWidth,
-      e.clientY / window.innerHeight
-    );
+    if (!this.likeArea) return;
+
+    const rect = this.likeArea.getBoundingClientRect();
+    const { offsetWidth, offsetHeight } = this.likeArea;
+    const { clientX, clientY } = e;
+    this.props.socket.emit('SEND_MOUSE_EVENT', {
+      mouse: 'down',
+      ratioX: (clientX - rect.left) / offsetWidth,
+      ratioY: (clientY - rect.top) / offsetHeight,
+    });
   }
 
   onAnimationEnd(e) {
@@ -77,30 +61,54 @@ class Like extends React.Component {
 
   render() {
     return (
-      <div
-        style={{
-          position: 'absolute',
-          top: '0',
-          width: '100vw',
-          height: '100vh',
-        }}
-        onMouseDown={this.onMouseDown}
-      >
-        {Object.keys(this.state.hearts).map(key => {
-          return (
-            <div
-              id={key}
-              className="heart"
-              key={key}
-              style={this.state.hearts[key].style}
-              onAnimationEnd={this.onAnimationEnd}
-            />
-          );
-        })}
-      </div>
+      <>
+        {this.props.children}
+        <div
+          style={likeStyle}
+          onMouseDown={this.onMouseDown}
+          ref={likeArea => (this.likeArea = likeArea)}
+        >
+          {Object.keys(this.state.hearts).map(key => {
+            return (
+              <div
+                id={key}
+                className="heart"
+                key={key}
+                style={this.state.hearts[key].style}
+                onAnimationEnd={this.onAnimationEnd}
+              />
+            );
+          })}
+        </div>
+      </>
     );
   }
 }
+
+const generateKey = () =>
+  Math.random()
+    .toString(36)
+    .substring(2);
+
+const likeStyle = {
+  position: 'absolute',
+  top: '0',
+  width: '100%',
+  height: '100%',
+};
+
+const heartStyle = (x, y) => {
+  return {
+    position: 'absolute',
+    width: '5rem',
+    height: '5rem',
+    top: y,
+    left: x,
+    transform: 'scale(2)',
+    opacity: '0',
+    animation: 'anime1 1s ease-in reverse',
+  };
+};
 
 const keyframesStyle = `
 @keyframes anime1{

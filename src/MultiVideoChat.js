@@ -347,18 +347,20 @@ class MultVideoChat extends React.Component {
           open={this.state.fullScreenId !== ''}
           onClose={this.onFullScreen}
         >
-          <video
-            style={fullScreenStyle}
-            autoPlay="1"
-            playsInline
-            ref={video => {
-              const fullScreen =
-                this.videos[this.state.fullScreenId] || this.video;
-              if (video && fullScreen) {
-                video.srcObject = fullScreen.srcObject;
-              }
-            }}
-          />
+          <Like socket={this.socket}>
+            <video
+              style={fullScreenStyle}
+              autoPlay="1"
+              playsInline
+              ref={video => {
+                const fullScreen =
+                  this.videos[this.state.fullScreenId] || this.video;
+                if (video && fullScreen) {
+                  video.srcObject = fullScreen.srcObject;
+                }
+              }}
+            />
+          </Like>
           <IconButton
             style={closeButtonStyle}
             color="primary"
@@ -382,7 +384,7 @@ class MultVideoChat extends React.Component {
             </Grid>
             {Object.keys(this.state.peers).map(key => {
               return (
-                <Grid item md={4} sm={6} xs={12}>
+                <Grid item md={4} sm={6} xs={12} key={key}>
                   <video
                     id={key}
                     key={key}
@@ -397,7 +399,6 @@ class MultVideoChat extends React.Component {
               );
             })}
           </Grid>
-          {this.state.fullScreenId ? <Like /> : null}
           <Drawer
             onCaptureStart={this.onCaptureStart}
             onCameraStart={this.onVideoStart}
