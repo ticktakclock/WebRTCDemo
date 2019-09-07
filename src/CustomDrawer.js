@@ -2,9 +2,6 @@ import React, { useContext } from 'react';
 import {
   Divider,
   Drawer,
-  Fab,
-  Grid,
-  Dialog,
   IconButton,
   List,
   ListItem,
@@ -36,7 +33,6 @@ const CustomDrawer = ({
     'Exit room': [
       <ExitToAppIcon />,
       () => {
-        console.log('gege');
         setRoomName('');
       },
     ],
@@ -84,7 +80,7 @@ const CustomDrawer = ({
       <Divider />
       <List>
         {['Exit room'].map(text => (
-          <ListItem button key={text} onClick={onClickItem}>
+          <ListItem button key={text} onClick={() => onClickItem(text)}>
             <ListItemIcon>{getIcon(text)}</ListItemIcon>
             <ListItemText primary={text} />
           </ListItem>
@@ -92,26 +88,6 @@ const CustomDrawer = ({
       </List>
     </Drawer>
   );
-};
-
-const fabStyle = {
-  display: 'block',
-  position: 'absolute',
-  bottom: '1rem',
-  right: '1rem',
-  width: '4rem',
-  height: '4rem',
-  background: '#03a9f4',
-  textAlign: 'center',
-  borderRadius: '50%',
-  boxShadow: '0 2px 2px 0 rgba(0,0,0,.12), 0 2px 2px 0 rgba(0,0,0,.24)',
-  cursor: 'pointer',
-};
-
-const muiFabStyle = {
-  position: 'absolute',
-  bottom: '2rem',
-  right: '2rem',
 };
 
 export default CustomDrawer;

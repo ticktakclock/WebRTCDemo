@@ -318,7 +318,7 @@ class MultVideoChat extends React.Component {
   onClickBye() {
     console.log('sending LEAVE');
     this.socket.emit('SEND_LEAVE');
-    Object.keys(this.state.peers).map(key => {
+    Object.keys(this.state.peers).forEach(key => {
       this.onDisconnect(key);
     });
   }
@@ -413,29 +413,10 @@ class MultVideoChat extends React.Component {
   }
 }
 
-const videoAreaStyle = {
-  display: 'flex',
-  flexWrap: 'wrap',
-};
-
 const videoStyle = {
   alignSelf: 'center',
   width: '100%',
   background: 'black',
-};
-
-const fabStyle = {
-  display: 'block',
-  position: 'absolute',
-  bottom: '1rem',
-  right: '1rem',
-  width: '4rem',
-  height: '4rem',
-  background: '#03a9f4',
-  textAlign: 'center',
-  borderRadius: '50%',
-  boxShadow: '0 2px 2px 0 rgba(0,0,0,.12), 0 2px 2px 0 rgba(0,0,0,.24)',
-  cursor: 'pointer',
 };
 
 const closeButtonStyle = {
@@ -446,17 +427,9 @@ const closeButtonStyle = {
 };
 
 const fullScreenStyle = {
-  // width: '100vw',
-  // height: '100vh',
   width: '100%',
   height: '100%',
   background: 'black',
-};
-
-const muiFabStyle = {
-  position: 'absolute',
-  bottom: '2rem',
-  right: '2rem',
 };
 
 export default MultVideoChat;

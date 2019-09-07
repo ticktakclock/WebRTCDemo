@@ -1,11 +1,12 @@
-import React, { Component, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Room from './Room';
 import Entrance from './Entrance';
 import { AppBar, Toolbar, IconButton } from '@material-ui/core';
-import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import MenuIcon from '@material-ui/icons/Menu';
 
 export const MenuContext = React.createContext(false);
+
+const DEAULT_TITLE = 'WebRTC Sample';
 
 const App = () => {
   const vh = window.innerHeight;
@@ -21,7 +22,7 @@ const App = () => {
     if (!roomName) {
       setMenuOpen(false);
     }
-  });
+  }, [roomName]);
   return (
     <>
       <MenuContext.Provider value={{ isMenuOpen, setMenuOpen, setRoomName }}>
@@ -34,18 +35,7 @@ const App = () => {
             >
               <MenuIcon />
             </IconButton>
-            <div style={titleStyle}>{roomName || 'WebRTC Sample'}</div>
-            {roomName ? (
-              <>
-                <IconButton
-                  color="inherit"
-                  style={{ marginLeft: 'auto' }}
-                  onClick={() => setRoomName('')}
-                >
-                  <ExitToAppIcon />
-                </IconButton>
-              </>
-            ) : null}
+            <div style={titleStyle}>{roomName || DEAULT_TITLE}</div>
           </Toolbar>
         </AppBar>
         <div style={appStyle}>
