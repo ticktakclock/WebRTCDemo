@@ -9,8 +9,6 @@ export const MenuContext = React.createContext(false);
 const DEAULT_TITLE = 'WebRTC Sample';
 
 const App = () => {
-  const vh = window.innerHeight;
-  document.documentElement.style.setProperty('--full-vh', `${vh}px`);
   navigator.getUserMedia =
     navigator.getUserMedia ||
     navigator.webkitGetUserMedia ||
@@ -38,7 +36,7 @@ const App = () => {
             <div style={titleStyle}>{roomName || DEAULT_TITLE}</div>
           </Toolbar>
         </AppBar>
-        <div style={appStyle}>
+        <div style={appStyle(window.innerHeight)}>
           {roomName ? (
             <Room roomName={roomName} />
           ) : (
@@ -50,12 +48,14 @@ const App = () => {
   );
 };
 
-const appStyle = {
-  height: 'calc(var(--full-vh))',
-  width: '100%',
-  overflow: 'scroll',
-  display: 'flex',
-  justifyContent: 'center',
+const appStyle = vh => {
+  return {
+    height: vh,
+    width: '100vw',
+    overflow: 'scroll',
+    display: 'flex',
+    justifyContent: 'center',
+  };
 };
 
 const titleStyle = {

@@ -11,7 +11,7 @@ const Room = ({ roomName }) => {
 
 const pageStyle = {
   paddingTop: '6rem',
-  height: '100%',
+  height: 'calc(100% -6rem)',
   width: '100%',
   overflow: 'scroll',
   display: 'flex',
