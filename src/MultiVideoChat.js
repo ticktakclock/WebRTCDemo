@@ -1,5 +1,14 @@
 import React from 'react';
-import { Grid, Dialog, IconButton } from '@material-ui/core';
+import {
+  Button,
+  Grid,
+  Dialog,
+  IconButton,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+} from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import io from 'socket.io-client';
 import Like from './Like';
@@ -16,6 +25,7 @@ class MultVideoChat extends React.Component {
       socketId: '',
       videoStyle: videoStyle,
       fullScreenId: '',
+      error: '',
     };
 
     this.onReceiveSdp = this.onReceiveSdp.bind(this);
@@ -42,6 +52,7 @@ class MultVideoChat extends React.Component {
     this.onVideoMute = this.onVideoMute.bind(this);
     this.onFullScreen = this.onFullScreen.bind(this);
     this.isFullScreen = this.isFullScreen.bind(this);
+    this.setError = this.setError.bind(this);
     this.videos = {};
     this.senders = {};
 
@@ -265,6 +276,10 @@ class MultVideoChat extends React.Component {
   }
 
   async onVideoStart() {
+    if (!navigator.getUserMedia) {
+      this.setError('webカメラ機能は本端末では非対応となります。');
+      return;
+    }
     // webカメラ
     navigator.getUserMedia(
       { video: true, audio: false },
@@ -283,7 +298,10 @@ class MultVideoChat extends React.Component {
   }
 
   async onCaptureStart() {
-    console.log(this.state.peers);
+    if (!navigator.getUserMedia) {
+      this.setError('画面キャプチャ機能は本端末では非対応となります。');
+      return;
+    }
     // 画面キャプチャ
     navigator.mediaDevices
       .getDisplayMedia({ video: true, audio: false })
@@ -342,9 +360,29 @@ class MultVideoChat extends React.Component {
     return this.state.fullScreenId === id;
   }
 
+  setError(message) {
+    this.setState({
+      error: message,
+    });
+  }
+
   render() {
     return (
       <>
+        <Dialog
+          open={this.state.error !== ''}
+          onClose={() => this.setError('')}
+        >
+          <DialogTitle>非対応機能です</DialogTitle>
+          <DialogContent>
+            <DialogContentText>{this.state.error}</DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button color="secondary" onClick={() => this.setError('')}>
+              OK
+            </Button>
+          </DialogActions>
+        </Dialog>
         <Dialog
           maxWidth="xl"
           fullScreen
