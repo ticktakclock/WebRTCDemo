@@ -302,6 +302,8 @@ class MultVideoChat extends React.Component {
   }
 
   onVideoStop() {
+    // 事前にmuteしておく
+    this.onVideoMute();
     // 映像停止
     let stream = this.video.srcObject;
     if (!stream) return;
@@ -317,6 +319,8 @@ class MultVideoChat extends React.Component {
 
   onClickBye() {
     console.log('sending LEAVE');
+    // 事前に映像を止めておく
+    this.onVideoStop();
     this.socket.emit('SEND_LEAVE');
     Object.keys(this.state.peers).forEach(key => {
       this.onDisconnect(key);
@@ -343,7 +347,7 @@ class MultVideoChat extends React.Component {
       <>
         <Dialog
           maxWidth="xl"
-          fullWidth
+          fullScreen
           open={this.state.fullScreenId !== ''}
           onClose={this.onFullScreen}
         >
