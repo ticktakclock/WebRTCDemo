@@ -3,6 +3,7 @@
 ## Usage
 
 ```
+$npm i
 $node server/app.js        // launch web socket server
 $npm start                 // launch client
 ```
